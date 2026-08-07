@@ -28,7 +28,7 @@ return (
                 {/* Map through the features array and render each feature */}
                 {features.map((item, index) => (
                     <div className="feature-box" key={index}>
-                        <i className={` fas ${item.icon}`}></i>
+                        <i className={`fas ${item.icon}`}></i>
                          <h3>{item.title}</h3>
                         <p>{item.description}</p>
                     </div>

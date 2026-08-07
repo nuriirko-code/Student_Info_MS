@@ -1,14 +1,21 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
+import Navbar from '../components/Navbar';
+import Hero from '../components/Hero';
+import About from '../components/About';
+import HowItWorks from '../components/HowItWorks';
+import KeyFeatures from '../components/KeyFeatures';
+import Footer from '../components/Footer';
 
-function App() {
+function Home() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <Navbar />
+      <Hero />
+      <About />
+      <HowItWorks />
+      <KeyFeatures />
+      <Footer />
+    </div>
   );
 }
 
-export default App;
+export default Home;
