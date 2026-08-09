@@ -1,6 +1,21 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  function handleLogin(e) {
+    e.preventDefault();
+    if (username === "admin" && password === "admin123") {
+      navigate('/dashboard');
+    } else {
+      setError("Invalid username or password");
+    }
+  }
+
   return (
     <div className="login-page">
       <div className="login-card">
@@ -8,29 +23,18 @@ function Login() {
           <i className="fas fa-graduation-cap"></i>
           <h2>SIMS Login</h2>
         </div>
-        <form>
+        <form onSubmit={handleLogin}>
           <div className="form-group">
             <label>Username</label>
-            <input type="text" placeholder="Enter username" required />
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input type="password" placeholder="Enter password" required />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
-          <div className="form-group">
-            <label>Login As</label>
-            <select>
-              <option value="admin">Admin</option>
-              <option value="student">Student</option>
-            </select>
-          </div>
-          {/*<button type="submit" className="btn-login-submit">Login</button> */}
-          <Link to="/dashboard" className="btn-login-submit" style={{ display: 'block', textAlign: 'center' }}>Login</Link>
-
+          {error && <p style={{color: 'red'}}>{error}</p>}
+          <button type="submit" className="btn-login-submit">Login</button>
         </form>
-        <Link to="/" className="back-link">
-          <i className="fas fa-arrow-left"></i> Back to Home
-        </Link>
       </div>
     </div>
   );

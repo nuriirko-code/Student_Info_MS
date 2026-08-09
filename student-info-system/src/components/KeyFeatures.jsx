@@ -23,6 +23,8 @@ function KeyFeatures() {
   }
 ];
 
+
+
 return (
 <section className = "features-section">
     <div className = "container">
