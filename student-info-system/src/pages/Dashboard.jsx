@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 const initialStudents = [
@@ -11,6 +11,61 @@ const initialStudents = [
 
 function Dashboard() {
   const [students] = useState(initialStudents);
+  const [githubStreak, setGithubStreak] = useState({ current: 0, lastUpdated: "" });
+  const [streakLoading, setStreakLoading] = useState(true);
+  const [streakError, setStreakError] = useState(null);
+
+  // Fetch GitHub streak data
+  useEffect(() => {
+    const fetchGithubStreak = async () => {
+      try {
+        setStreakLoading(true);
+        // Replace with your actual GitHub username
+        const username = "your-github-username";
+        
+        // Using GitHub GraphQL API to get contribution streak
+        const query = `
+          query {
+            user(login: "${username}") {
+              contributionsCollection {
+                contributionCalendar {
+                  totalContributions
+                }
+              }
+            }
+          }
+        `;
+
+        const response = await fetch("https://api.github.com/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Note: For production, use environment variables for token
+            "Authorization": "Bearer YOUR_GITHUB_TOKEN",
+          },
+          body: JSON.stringify({ query }),
+        });
+
+        const data = await response.json();
+
+        if (data.data?.user) {
+          setGithubStreak({
+            current: data.data.user.contributionsCollection.contributionCalendar.totalContributions || 0,
+            lastUpdated: new Date().toLocaleDateString(),
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching GitHub streak:", error);
+        setStreakError("Failed to load streak data");
+        // Set default values on error
+        setGithubStreak({ current: 0, lastUpdated: new Date().toLocaleDateString() });
+      } finally {
+        setStreakLoading(false);
+      }
+    };
+
+    fetchGithubStreak();
+  }, []);
 
   const metrics = useMemo(() => {
     const total = students.length;
@@ -75,7 +130,7 @@ function Dashboard() {
             </Link>
           </header>
 
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 lg:grid-cols-5">
             <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
               <p className="text-sm text-slate-500">Total students</p>
               <p className="mt-4 text-3xl font-semibold text-slate-900">{metrics.total}</p>
@@ -91,6 +146,14 @@ function Dashboard() {
             <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
               <p className="text-sm text-slate-500">Absent today</p>
               <p className="mt-4 text-3xl font-semibold text-slate-900">{metrics.absent}</p>
+            </div>
+            <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+              <p className="text-sm text-slate-500">GitHub Streak 🔥</p>
+              <p className="mt-4 text-3xl font-semibold text-slate-900">
+                {streakLoading ? "..." : githubStreak.current}
+              </p>
+              {streakError && <p className="mt-2 text-xs text-rose-600">{streakError}</p>}
+              {!streakError && <p className="mt-2 text-xs text-slate-400">Updated: {githubStreak.lastUpdated}</p>}
             </div>
           </section>
 
