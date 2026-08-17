@@ -1,64 +1,28 @@
+// The CEO/ Main Gate (starts everything up)
+//React sends an API request to (server.js)
+//( server.js) passes it to the  reception desk(routes) to see which path was clicked
+//The (routes) reads the path and calls the specific worker in the Brains department(controllers)
+// The worker (controllers) reaches into the maintenance room(db.js) to pull or save data in MongoDB, then hands it back  to React.
+
 const express = require('express');
-const cors = require('cors');
 const app = express();
 
-// Middleware
+const { connectToDb } = require('./db');
+const studentRoutes = require('./routes/studentRoutes');
+
+
 app.use(express.json());
-app.use(cors());
+app.use(studentRoutes);
 
-// Initial in-memory student database
-let students = [
-  { id: "SIMS-001", firstName: "John", lastName: "Doe", gender: "Male", dept: "Computer Science", level: "300", cgpa: "3.50" },
-  { id: "SIMS-002", firstName: "Jane", lastName: "Smith", gender: "Female", dept: "Business Admin", level: "200", cgpa: "3.80" }
-];
 
-// Health check route
-app.get('/', (req, res) => {
-  res.send('SIMS backend is running');
-});
+const PORT = 3000;
 
-// GET all students
-app.get('/students', (req, res) => {
-  res.json(students);
-});
-
-// POST a new student
-app.post('/students', (req, res) => {
-  const newStudent = req.body;
-  students.push(newStudent);
-  res.json(newStudent);
-});
-
-// PUT (Update) an existing student by ID
-app.put('/students/:id', (req, res) => {
-  const { id } = req.params;
-  const updatedData = req.body;
-
-  const index = students.findIndex((s) => String(s.id).trim() === String(id).trim());
-
-  if (index !== -1) {
-    students[index] = { ...students[index], ...updatedData, id };
-    return res.json(students[index]);
+connectToDb((err) => {
+  if(!err)  {
+    app.listen(PORT, () => {
+      console.log(`SIMS Backend server is listening cleanly on port ${PORT}`);
+    });
   } else {
-    return res.status(404).json({ error: `Student with ID ${id} not found` });
+    console.log('Database connection failed. Server cannot start.');
   }
-});
-
-// DELETE a student by ID
-app.delete('/students/:id', (req, res) => {
-  const { id } = req.params;
-
-  const index = students.findIndex((s) => String(s.id).trim() === String(id).trim());
-
-  if (index !== -1) {
-    const deletedStudent = students.splice(index, 1);
-    return res.json({ message: 'Deleted successfully', student: deletedStudent[0] });
-  } else {
-    return res.status(404).json({ error: `Student with ID ${id} not found` });
-  }
-});
-
-const PORT = 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
 });
