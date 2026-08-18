@@ -5,12 +5,16 @@
 // The worker (controllers) reaches into the maintenance room(db.js) to pull or save data in MongoDB, then hands it back  to React.
 
 const express = require('express');
+
+
+const cors = require('cors');
 const app = express();
 
 const { connectToDb } = require('./db');
 const studentRoutes = require('./routes/studentRoutes');
 
 
+app.use(cors());
 app.use(express.json());
 app.use(studentRoutes);
 

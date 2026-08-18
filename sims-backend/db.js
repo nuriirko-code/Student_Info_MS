@@ -12,7 +12,7 @@ module.exports = { // module.exports {...} is blobal obj,everything inside is sh
         })
         .catch((err) => {
             console.log(err);
-            return cb(err);
+            return cb(err); 
         })
     },
     getDb: () => dbConnection // when controllers call this func, it returns the live db connection.
